@@ -253,161 +253,6 @@ const ProductScreen = () => {
     return rows;
   };
 
-  const onSubmitXML = async () => {
-    setMessage(initialState);
-    setMessage2(initialState);
-    setMessage3(initialState);
-
-    let errors: Product[] = [];
-
-    //guarda los que no tienen errores de types
-    const filterTypes: any[] = registers
-      .map((product) =>
-        isNaN(product.price) || isNaN(product.stock)
-          ? errors.push(product)
-          : product
-      )
-      .filter((err) => typeof err === "object");
-
-    //muestra mensaje de los productos con errores
-    if (errors.length > 0) {
-      setShowAlert1(true);
-      setMessage({
-        type: "danger",
-        message: (
-          <>
-            <span>
-              Se han encontrado {errors.length} productos que no fueron
-              agregados porque el precio o stock no tienen un formato numerico,
-              el precio debe contener "." en lugar de "," y ser un valor
-              numerico por ejemplo: 1.50 y el stock debe ser un valor entero.
-            </span>
-            {
-              <ul>
-                {errors.map((err) => (
-                  <li key={err.cod_internal}>
-                    Producto{err.cod_internal}: {err.name} - precio: {err.price}{" "}
-                    - stock: {err.stock}
-                  </li>
-                ))}
-              </ul>
-            }
-          </>
-        ),
-      });
-    }
-
-    let productsEquals: any[] = [];
-    let productsAdds: any[] = [];
-
-    //de los productos filtrados correctamente se formatea con el cod del area
-    const getProductsByArea = String(user.area._id).slice(-3).toUpperCase();
-    const formatFiltersTypes = filterTypes.map((format) => {
-      return {
-        ...format, //{cod_internal: '679xxxxcc'}
-        cod_internal: getProductsByArea + format.cod_internal,
-      };
-    });
-
-    //busca los existentes de lo formateado con los productos ya registrados
-    products.filter((product) => {
-      formatFiltersTypes.map((format) => {
-        if (
-          String(format.cod_internal).toUpperCase() ===
-          String(product.cod_internal).toUpperCase()
-        ) {
-          productsEquals.push(format);
-        }
-      });
-    });
-
-    //busca los registros nuevos pero aun esta con el formato
-    //{cod_internal: '679xxxxcc'}
-    formatFiltersTypes.filter((product) => {
-      if (!productsEquals.includes(product)) {
-        productsAdds.push(product);
-      }
-    });
-
-    //quitando el formato {cod_internal: '679xxxxcc'} a {cod_internal: 'xxxxcc'}
-    const noCodeToAdd = productsAdds.map((add) => {
-      const getProductsByArea = String(add.cod_internal).slice(3).toUpperCase();
-      return {
-        ...add,
-        cod_internal: getProductsByArea,
-      };
-    });
-
-    if (productsEquals.length > 0) {
-      setShowAlert2(true);
-      setMessage2({
-        type: "warning",
-        message: (
-          <>
-            Se han encontrado {productsEquals.length} productos que ya se
-            encuentran registrados. Quieres{" "}
-            <strong>
-              ¿Volver a registrar de todas formas? (Esto lo actualizara el
-              producto con los mismos datos de tu excel).
-            </strong>{" "}
-            Si solo quieres actualizar una parte en especifico del producto. Por
-            favor seleccione el producto de la tabla directamente.{" "}
-            <Button
-              variant="secondary"
-              onClick={() => onSubmitXMLTwo(productsEquals)}
-            >
-              Actualizar de todas formas
-            </Button>{" "}
-            <Button variant="danger" onClick={cancelXML}>
-              Cancelar
-            </Button>
-          </>
-        ),
-      });
-    }
-
-    if (noCodeToAdd.length > 0) {
-      for (let i = 0; i < noCodeToAdd.length; i++) {
-        const product = noCodeToAdd[i];
-        await postCreateProduct(product);
-        setShowAlert3(true);
-        setMessage3({
-          type: "success",
-          message: `Se han agregado ${noCodeToAdd.length} productos con éxito.`,
-        });
-      }
-      listProducts();
-    }
-  };
-
-  const onSubmitXMLTwo = async (array: any[]) => {
-    for (let i = 0; i < array.length; i++) {
-      const product = {
-        ...array[i],
-        xmls: true,
-      };
-
-      await postCreateProduct(product);
-      setMessage2({
-        type: "success",
-        message: (
-          <>
-            <span>{array.length} productos actualizados con éxito.</span>
-            <ul>
-              {array.map((arr) => (
-                <li key={arr.cod_internal}>
-                  Producto{arr.cod_internal}: {arr.name}
-                </li>
-              ))}
-            </ul>
-          </>
-        ),
-      });
-    }
-
-    listProducts();
-  };
-
   const cancelXML = () => {
     setShowAlert2(false);
     setMessage2(initialState);
@@ -576,7 +421,7 @@ const ProductScreen = () => {
                   <Button
                     type="button"
                     variant="dark"
-                    onClick={onSubmitXML}
+                    //onClick={onSubmitXML}
                     disabled={file ? false : true}
                   >
                     Cargar registros
@@ -642,7 +487,7 @@ const ProductScreen = () => {
                   <Button
                     type="button"
                     variant="dark"
-                    onClick={onSubmitXML}
+                    //onClick={onSubmitXML}
                     disabled={file ? false : true}
                   >
                     Cargar registros

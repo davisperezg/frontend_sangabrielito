@@ -47,9 +47,9 @@ const ProductForm = ({
     mark: "",
     model: "",
     unit: "",
-    stock: 0,
-    price: 0,
-    price_c: 0,
+    //stock: 0,
+    //price: 0,
+    //price_c: 0,
     cod_internal: "",
     note: "",
   };
@@ -132,19 +132,12 @@ const ProductForm = ({
       });
     setForm({
       ...form,
-      [e.target.name]:
-        e.target.name === "stock"
-          ? Number(e.target.value)
-          : e.target.name === "price"
-          ? Number(e.target.value)
-          : e.target.name === "price_c"
-          ? Number(e.target.value)
-          : e.target.value,
+      [e.target.name]: e.target.value,
     });
   };
 
   const findFormErrors = () => {
-    const { name, cod_internal, mark, model, unit, stock, price } = form;
+    const { name, cod_internal, mark, model, unit } = form;
 
     const newErrors: any = {};
 
@@ -156,8 +149,8 @@ const ProductForm = ({
       newErrors.model = "Por favor seleccione el modelo.";
     if (!unit || unit === "")
       newErrors.unit = "Por favor seleccione la unidad de medida.";
-    if (stock < 0) newErrors.stock = "Por favor un stock valido.";
-    if (price < 0) newErrors.price = "Por favor un stock valido.";
+    // if (stock < 0) newErrors.stock = "Por favor un stock valido.";
+    // if (price < 0) newErrors.price = "Por favor un stock valido.";
     // else if (!nroDocument || nroDocument.length < 8 || nroDocument.length > 11)
     //   newErrors.nroDocument =
     //     "Por favor ingrese el nro de documento de 8 - 11 caracteres";
@@ -250,9 +243,9 @@ const ProductForm = ({
         mark: product?.mark,
         model: product?.model,
         unit: product?.unit,
-        stock: product?.stock,
-        price: product?.price,
-        price_c: product?.price_c,
+        // stock: product?.stock,
+        // price: product?.price,
+        // price_c: product?.price_c,
         fecVen: product?.fecVen
           ? formatFech(new Date(product?.fecVen))
           : undefined,
@@ -266,9 +259,9 @@ const ProductForm = ({
     product?.mark,
     product?.model,
     product?.unit,
-    product?.stock,
-    product?.price,
-    product?.price_c,
+    // product?.stock,
+    // product?.price,
+    // product?.price_c,
     product?.fecVen,
   ]);
 
@@ -467,55 +460,6 @@ const ProductForm = ({
                 {errors?.fecVen}
               </Form.Control.Feedback>
             </Form.Group>
-          </Row>
-
-          <Row className="mb-3">
-            <Form.Group as={Col} controlId="formGridStock">
-              <Form.Label>Stock</Form.Label>
-              <Form.Control
-                name="stock"
-                type="number"
-                onChange={handleChange}
-                value={form?.stock}
-                isInvalid={!!errors?.stock}
-                placeholder="Introduce un stock"
-              />
-              <Form.Control.Feedback type="invalid">
-                {errors?.stock}
-              </Form.Control.Feedback>
-            </Form.Group>
-            <Form.Group as={Col} controlId="formGridStock">
-              <Form.Label>Precio Venta</Form.Label>
-              <Form.Control
-                name="price"
-                type="number"
-                step="0.01"
-                onChange={handleChange}
-                value={form?.price}
-                isInvalid={!!errors?.price}
-                placeholder="Introduce un precio venta"
-              />
-              <Form.Control.Feedback type="invalid">
-                {errors?.price}
-              </Form.Control.Feedback>
-            </Form.Group>
-            {user.role.name === "SUPER ADMINISTRADOR" && (
-              <Form.Group as={Col} controlId="formGridStock">
-                <Form.Label>Precio Costo</Form.Label>
-                <Form.Control
-                  name="price_c"
-                  type="number"
-                  step="0.01"
-                  onChange={handleChange}
-                  value={form?.price_c}
-                  isInvalid={!!errors?.price_c}
-                  placeholder="Introduce un precio costo"
-                />
-                <Form.Control.Feedback type="invalid">
-                  {errors?.price_c}
-                </Form.Control.Feedback>
-              </Form.Group>
-            )}
           </Row>
         </Modal.Body>
         <Modal.Footer>

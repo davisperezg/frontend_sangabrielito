@@ -90,7 +90,7 @@ const ProductListActive = ({
           >
             {String(unit.name)}
           </td>
-          <td
+          {/* <td
             className={styles.table__td}
             onClick={() => openModalRE(true, product)}
           >
@@ -99,8 +99,8 @@ const ProductListActive = ({
             ) : (
               <strong style={{ color: "green" }}>{product.stock}</strong>
             )}
-          </td>
-          <td
+          </td> */}
+          {/* <td
             className={styles.table__td}
             onClick={() => openModalRE(true, product)}
           >
@@ -116,7 +116,7 @@ const ProductListActive = ({
                 ? "No registrado"
                 : formatter.format(product.price_c)}
             </td>
-          )}
+          )} */}
 
           <td
             className={`${styles.table__td} ${styles["table--center"]}`}
@@ -143,7 +143,7 @@ const ProductListActive = ({
           <td>{String(mark.name)}</td>
           <td>{String(model.name)}</td>
           <td>{String(unit.name)}</td>
-          <td>
+          {/* <td>
             {product.stock <= 10 ? (
               <strong style={{ color: "red" }}>{product.stock}</strong>
             ) : (
@@ -158,7 +158,7 @@ const ProductListActive = ({
                 ? "No registrado"
                 : formatter.format(product.price_c)}
             </td>
-          )}
+          )} */}
 
           <td className={`${styles.table__td} ${styles["table--center"]}`}>
             {product.status && <Badge bg="success">Activo</Badge>}

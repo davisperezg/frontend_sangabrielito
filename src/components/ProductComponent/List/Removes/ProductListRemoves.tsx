@@ -47,7 +47,7 @@ const ProductListRemoves = ({
         <td>{String(mark.name)}</td>
         <td>{String(model.name)}</td>
         <td>{String(unit.name)}</td>
-        <td>{remove.stock}</td>
+        {/* <td>{remove.stock}</td>
         <td>S/ {formatter.format(remove.price)}</td>
         {user.role.name === "SUPER ADMINISTRADOR" && (
           <td>
@@ -56,7 +56,7 @@ const ProductListRemoves = ({
               ? "No registrado"
               : formatter.format(remove.price_c)}
           </td>
-        )}
+        )} */}
 
         <td className={`${styles["table--center"]}`}>
           {remove.status === false && <Badge bg="danger">Eliminado</Badge>}

@@ -11,9 +11,9 @@ export interface Product {
   area?: Area | string;
   model: Model | string;
   unit: Unit | string;
-  stock: number;
-  price: number;
+  //stock: number;
+  //price: number;
   status?: boolean;
-  price_c: number;
+  //price_c: number;
   fecVen?: Date | string;
 }

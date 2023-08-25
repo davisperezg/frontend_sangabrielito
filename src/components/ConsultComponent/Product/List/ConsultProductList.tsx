@@ -49,8 +49,8 @@ const ConsultProductList = ({
             : "Sin fecha de vencimiento"}
         </td>
         <td>{String(unit.name)}</td>
-        <td>{product.stock}</td>
-        <td>S/ {product.price}</td>
+        {/* <td>{product.stock}</td>
+        <td>S/ {product.price}</td> */}
         <td>{product.status && <Badge bg="success">Activo</Badge>}</td>
       </tr>
     </>
