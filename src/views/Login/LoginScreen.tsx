@@ -9,6 +9,7 @@ import { setsesionLocal } from "../../lib/helpers/sesion/sesion";
 import { AuthContext } from "../../context/auth";
 import { whois } from "../../api/user/user";
 import { getResourceByRol } from "../../api/resources/rosources";
+import logoClinica from "../../assets/img/logo_clinica.png";
 
 const LoginScreen = () => {
   const navigate = useNavigate();
@@ -55,11 +56,33 @@ const LoginScreen = () => {
   return (
     <>
       <div className={styles.login}>
-        <h1 className={styles.title}>INICIO DEL SISTEMA</h1>
+        {/* <h1 className={styles.title}>INICIO DEL SISTEMA</h1> */}
+        {/* <img
+          style={{
+            backgroundColor: "#000",
+          }}
+          alt="Clinica San Gabrielito"
+          src={logoClinica}
+          width={167}
+          height={30}
+        /> */}
         <div className={styles.login__center}>
           {message && <Alert variant="danger">{message}</Alert>}
           <Card>
-            <Card.Header as="h5">Acceso al sistema</Card.Header>
+            <Card.Header
+              style={{
+                backgroundColor: "#8f0ac9",
+                color: "#fff",
+              }}
+              as="h5"
+            >
+              <img
+                alt="Clinica San Gabrielito"
+                src={logoClinica}
+                width={167}
+                height={30}
+              />
+            </Card.Header>
 
             <Card.Body>
               <Form onSubmit={handleSubmit(onSubmit)}>
@@ -116,7 +139,7 @@ const LoginScreen = () => {
                 </Row>
                 <Button
                   type="submit"
-                  variant="primary"
+                  variant="secondary"
                   className="w-100"
                   disabled={disabled}
                 >

@@ -6,16 +6,23 @@ import { memo, useCallback, useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../../../context/auth";
 import { useLocation } from "react-router-dom";
 import { getModuleByMenu } from "../../../../api/module/module";
-import { formatter } from "../../../../lib/helpers/functions/functions";
+import {
+  convertDateToUTCLocal,
+  formatDate,
+  formatter,
+} from "../../../../lib/helpers/functions/functions";
+import { MdOutlineRestore } from "react-icons/md";
 
 const ProductListActive = ({
   product,
   deleteProd,
+  restorePro,
   openModalRE,
   item,
 }: {
   product: Product;
   deleteProd: (id: string) => void;
+  restorePro: (id: string) => void;
   openModalRE: (props: boolean, value?: any) => void;
   item?: number;
 }) => {
@@ -70,12 +77,6 @@ const ProductListActive = ({
             className={styles.table__td}
             onClick={() => openModalRE(true, product)}
           >
-            {product.note}
-          </td>
-          <td
-            className={styles.table__td}
-            onClick={() => openModalRE(true, product)}
-          >
             {String(mark.name)}
           </td>
           <td
@@ -89,6 +90,51 @@ const ProductListActive = ({
             onClick={() => openModalRE(true, product)}
           >
             {String(unit.name)}
+          </td>
+          <td
+            className={styles.table__td}
+            onClick={() => openModalRE(true, product)}
+          >
+            {product.nroSerie}
+          </td>
+          <td
+            className={styles.table__td}
+            onClick={() => openModalRE(true, product)}
+          >
+            {product.cod_barra}
+          </td>
+          <td
+            className={styles.table__td}
+            onClick={() => openModalRE(true, product)}
+          >
+            {product?.fecAquision
+              ? convertDateToUTCLocal(new Date(String(product.fecAquision)))
+              : "-"}
+          </td>
+
+          <td
+            className={styles.table__td}
+            onClick={() => openModalRE(true, product)}
+          >
+            {product?.fecInicioUso
+              ? convertDateToUTCLocal(new Date(String(product.fecInicioUso)))
+              : "-"}
+          </td>
+
+          <td
+            className={styles.table__td}
+            onClick={() => openModalRE(true, product)}
+          >
+            {product?.fecVen
+              ? convertDateToUTCLocal(new Date(String(product.fecVen)))
+              : "-"}
+          </td>
+
+          <td
+            className={styles.table__td}
+            onClick={() => openModalRE(true, product)}
+          >
+            {product.ubicacionLocal}-{product.areaLocal}-{product.lugarLocal}
           </td>
           {/* <td
             className={styles.table__td}
@@ -118,20 +164,36 @@ const ProductListActive = ({
             </td>
           )} */}
 
+          {/* ${styles["table--center"]} */}
           <td
-            className={`${styles.table__td} ${styles["table--center"]}`}
+            className={`${styles.table__td} `}
             onClick={() => openModalRE(true, product)}
           >
-            {product.status && <Badge bg="success">Activo</Badge>}
+            {product.status ? (
+              <Badge bg="success">Activo</Badge>
+            ) : (
+              <Badge bg="danger">Inactivo</Badge>
+            )}
           </td>
-          {resource && resource.canDelete && (
-            <td className={`${styles["table--center"]}`}>
-              <IoMdClose
-                className={styles.table__iconClose}
-                onClick={() => deleteProd(String(product._id))}
-              />
-            </td>
-          )}
+          <td className={`${styles["table--center"]}`}>
+            {product.status
+              ? resource &&
+                resource.canDelete && (
+                  <IoMdClose
+                    className={styles.table__iconClose}
+                    onClick={() => deleteProd(String(product._id))}
+                  />
+                )
+              : resource &&
+                resource.canRestore && (
+                  <td className={`${styles["table--center"]}`}>
+                    <MdOutlineRestore
+                      className={styles.table__iconRestore}
+                      onClick={() => restorePro(String(product._id))}
+                    />
+                  </td>
+                )}
+          </td>
         </tr>
       ) : (
         <tr>

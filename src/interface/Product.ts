@@ -4,6 +4,8 @@ import { Model } from "./Model";
 import { Unit } from "./Unit";
 export interface Product {
   _id?: string;
+  cod_barra?: string; //new
+  nroSerie?: string; //new
   cod_internal: string;
   name: string;
   note?: string;
@@ -14,6 +16,11 @@ export interface Product {
   //stock: number;
   //price: number;
   status?: boolean;
-  //price_c: number;
+  price_c: number;
   fecVen?: Date | string;
+  fecInicioUso?: Date | string; //new
+  fecAquision?: Date | string; //new
+  ubicacionLocal?: string; //new
+  areaLocal?: string; //new
+  lugarLocal?: string; //new
 }

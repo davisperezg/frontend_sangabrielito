@@ -10,8 +10,8 @@ const ConsultProductList = ({
   product: Product;
   item: number;
 }) => {
-  const { unit, area }: any = product;
-
+  const { unit, area, mark, model }: any = product;
+  console.log(product);
   return (
     <>
       <tr>
@@ -19,10 +19,20 @@ const ConsultProductList = ({
         <td>{String(area.name)}</td>
         <td>{String(product.cod_internal).slice(3)}</td>
         <td>{product.name}</td>
+        <td>{String(mark.name)}</td>
+        <td>{String(model.name)}</td>
+        <td>{String(unit.name)}</td>
+        <td>{product.nroSerie}</td>
+        <td>{product.cod_barra}</td>
         <td>
-          {product?.fecVen
-            ? convertDateToUTCLocal(new Date(String(product?.fecVen)))
-            : "Sin fecha de vencimiento"}
+          {product?.fecAquision
+            ? convertDateToUTCLocal(new Date(String(product?.fecAquision)))
+            : "-"}
+        </td>
+        <td>
+          {product?.fecInicioUso
+            ? convertDateToUTCLocal(new Date(String(product?.fecInicioUso)))
+            : "-"}
         </td>
         <td>
           {product?.fecVen ? (
@@ -44,14 +54,17 @@ const ConsultProductList = ({
           )}
         </td>
         <td>
-          {product?.fecVen
-            ? differenceInDays(new Date(String(product?.fecVen)), new Date())
-            : "Sin fecha de vencimiento"}
+          {product.ubicacionLocal}-{product.areaLocal}-{product.lugarLocal}
         </td>
-        <td>{String(unit.name)}</td>
         {/* <td>{product.stock}</td>
         <td>S/ {product.price}</td> */}
-        <td>{product.status && <Badge bg="success">Activo</Badge>}</td>
+        <td>
+          {product.status ? (
+            <Badge bg="success">Activo</Badge>
+          ) : (
+            <Badge bg="danger">Inactivo</Badge>
+          )}
+        </td>
       </tr>
     </>
   );

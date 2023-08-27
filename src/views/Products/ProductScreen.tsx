@@ -29,6 +29,7 @@ import PaginationComponent from "../../components/DatatableComponent/Pagination/
 import Search from "../../components/DatatableComponent/Search/Search";
 import TableHeader from "../../components/DatatableComponent/Header/TableHeader";
 import { CSVLink } from "react-csv";
+import { convertDateToUTCLocal } from "../../lib/helpers/functions/functions";
 
 const initialState: IAlert = {
   type: "",
@@ -38,19 +39,25 @@ const initialState: IAlert = {
 const EXTENSIONS = ["xlsx", "xls", "csv"];
 
 const headers = [
-  { name: "Item", field: "item", sortable: false },
-  { name: "Area / Sede", field: "area", sortable: true },
-  { name: "Cod. Barra / interno", field: "cod_internal", sortable: true },
+  { name: "#", field: "item", sortable: false },
+  { name: "Sede", field: "area", sortable: true },
+  { name: "Cod. Interno", field: "cod_internal", sortable: true },
   { name: "Producto", field: "name", sortable: true },
-  { name: "Nota", field: "note", sortable: false },
   { name: "Marca", field: "mark", sortable: true },
   { name: "Modelo", field: "model", sortable: true },
-  { name: "Unidad de medida", field: "unit", sortable: true },
-  { name: "Stock", field: "stock", sortable: true },
-  { name: "Precio Venta", field: "price", sortable: true },
-  { name: "Precio Costo", field: "price_c", sortable: true },
+  { name: "Uni. Medida", field: "unit", sortable: true },
+  { name: "Nro. Serie", field: "nroSerie", sortable: true },
+  { name: "Cod. Barra", field: "cod_barra", sortable: true },
+  { name: "Fec. Adquisicion", field: "fecAquision", sortable: true },
+  { name: "Fec. Inicio", field: "fecInicioUso", sortable: true },
+  { name: "Fec. Vencimiento", field: "fecVen", sortable: true },
+  { name: "Ubicación", field: "ubi", sortable: false },
+
+  // { name: "Stock", field: "stock", sortable: true },
+  // { name: "Precio Venta", field: "price", sortable: true },
+  // { name: "Precio Costo", field: "price_c", sortable: true },
   { name: "Estado", field: "status", sortable: false },
-  { name: "Eliminar", field: "delete", sortable: false },
+  { name: "", field: "delete", sortable: false },
 ];
 
 const headersFormat = [
@@ -345,6 +352,8 @@ const ProductScreen = () => {
     return {
       ...product,
       item: i + 1,
+      cod_internal: product.cod_internal.slice(3),
+      ubi: `${product.ubicacionLocal}-${product.areaLocal}-${product.lugarLocal}`,
       area: product.area.name,
       mark: product.mark.name,
       model: product.model.name,
@@ -385,7 +394,7 @@ const ProductScreen = () => {
                     Agregar producto
                   </Button>
                 </div>
-                <div className={styles.contentButtons__excel}>
+                {/* <div className={styles.contentButtons__excel}>
                   <Form.Group className={styles.contentButtons__excel__input}>
                     <CSVLink
                       data={dataFormat}
@@ -426,11 +435,11 @@ const ProductScreen = () => {
                   >
                     Cargar registros
                   </Button>
-                </div>
+                </div> */}
               </div>
-              <div className={styles.cantExcel}>
+              {/* <div className={styles.cantExcel}>
                 {registers.length} productos encontrados.
-              </div>
+              </div> */}
               <ProductForm
                 show={show}
                 closeModal={closeModal}
@@ -526,7 +535,9 @@ const ProductScreen = () => {
                   <CSVLink
                     data={dataExportProducts}
                     headers={formatExportProducts}
-                    filename="productos.csv"
+                    filename={`productos_${convertDateToUTCLocal(
+                      new Date()
+                    )}.csv`}
                     target="_blank"
                     separator={";"}
                   >
@@ -554,7 +565,14 @@ const ProductScreen = () => {
                   </span>
                 </div>
               </div>
-              <Table striped bordered hover responsive className={styles.table}>
+              <Table
+                striped
+                bordered
+                hover
+                responsive
+                className={styles.table}
+                size="sm"
+              >
                 <TableHeader
                   headers={
                     user.role.name === "SUPER ADMINISTRADOR"
@@ -571,10 +589,11 @@ const ProductScreen = () => {
                       product={pro}
                       openModalRE={openModalRE}
                       deleteProd={_deleteProduct}
+                      restorePro={_restoreProduct}
                     />
                   ))}
                 </tbody>
-                <tfoot>
+                {/* <tfoot>
                   {removes.map((remove, item: number) => (
                     <ProductListRemoves
                       item={item + 1}
@@ -583,7 +602,7 @@ const ProductScreen = () => {
                       restorePro={_restoreProduct}
                     />
                   ))}
-                </tfoot>
+                </tfoot> */}
               </Table>
             </>
           )}

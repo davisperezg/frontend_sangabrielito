@@ -1,5 +1,10 @@
+// Required
+@import "node_modules/bootstrap/scss/functions";
+@import "node_modules/bootstrap/scss/variables";
+@import "node_modules/bootstrap/scss/mixins";
+@import "../../variables";
 .footer {
-  background-color: #000;
+  background-color: $secondary;
   color: #fff;
   height: 80px;
   width: 100%;

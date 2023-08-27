@@ -6,7 +6,7 @@ import { AuthContext } from "../../context/auth";
 import { User } from "../../interface/User";
 import { deleteSesions } from "../../lib/helpers/sesion/sesion";
 import { NavLink, useNavigate } from "react-router-dom";
-import { BsList } from "react-icons/bs";
+import logoClinica from "../../assets/img/logo_clinica.png";
 
 const Header = () => {
   const { user, setUser } = useContext(AuthContext);
@@ -28,7 +28,12 @@ const Header = () => {
       <div className={styles.item}>
         <div className={styles.item__left}>
           <h1>
-            Clinica <strong>San Gabrielito</strong>{" "}
+            <img
+              width={167}
+              height={30}
+              alt="Clinica - San Gabrielito"
+              src={logoClinica}
+            />
             <label className={styles.item__list} htmlFor={styles.btn_hamburger}>
               ☰
             </label>
@@ -75,9 +80,9 @@ const Header = () => {
             title={<FaUserAlt className={styles.item__icon} />}
             id="dropdown-menu-align-responsive-2"
           >
-            <Dropdown.Item eventKey="1">Configuración</Dropdown.Item>
-            <Dropdown.Divider />
-            <Dropdown.Item eventKey="2" onClick={logout}>
+            {/* <Dropdown.Item eventKey="1">Configuración</Dropdown.Item> */}
+            {/* <Dropdown.Divider /> */}
+            <Dropdown.Item eventKey="1" onClick={logout}>
               Salir
             </Dropdown.Item>
           </DropdownButton>

@@ -49,9 +49,14 @@ const ProductForm = ({
     unit: "",
     //stock: 0,
     //price: 0,
-    //price_c: 0,
+    price_c: 0,
+    cod_barra: "",
     cod_internal: "",
+    nroSerie: "",
     note: "",
+    areaLocal: "",
+    ubicacionLocal: "",
+    lugarLocal: "",
   };
 
   const initialState: IAlert = {
@@ -132,7 +137,8 @@ const ProductForm = ({
       });
     setForm({
       ...form,
-      [e.target.name]: e.target.value,
+      [e.target.name]:
+        e.target.name === "price_c" ? Number(e.target.value) : e.target.value,
     });
   };
 
@@ -245,10 +251,19 @@ const ProductForm = ({
         unit: product?.unit,
         // stock: product?.stock,
         // price: product?.price,
-        // price_c: product?.price_c,
+        price_c: product?.price_c,
         fecVen: product?.fecVen
           ? formatFech(new Date(product?.fecVen))
           : undefined,
+        fecInicioUso: product?.fecInicioUso
+          ? formatFech(new Date(product?.fecInicioUso))
+          : undefined,
+        fecAquision: product?.fecAquision
+          ? formatFech(new Date(product?.fecAquision))
+          : undefined,
+        ubicacionLocal: product?.ubicacionLocal,
+        areaLocal: product?.areaLocal,
+        lugarLocal: product?.lugarLocal,
       });
     }
   }, [
@@ -261,8 +276,13 @@ const ProductForm = ({
     product?.unit,
     // product?.stock,
     // product?.price,
-    // product?.price_c,
+    product?.price_c,
     product?.fecVen,
+    product?.fecInicioUso,
+    product?.fecAquision,
+    product?.ubicacionLocal,
+    product?.areaLocal,
+    product?.lugarLocal,
   ]);
 
   useEffect(() => {
@@ -301,55 +321,6 @@ const ProductForm = ({
               </Form.Group>
             </Col>
           </Row>
-          <Row className="mb-3">
-            <Form.Group as={Col} controlId="formGridName">
-              <Form.Label>
-                Nombre <strong className="text-danger">*</strong>
-              </Form.Label>
-              <Form.Control
-                name="name"
-                onChange={handleChange}
-                value={form?.name}
-                type="text"
-                placeholder="Introduce nombre"
-                isInvalid={!!errors?.name}
-              />
-              <Form.Control.Feedback type="invalid">
-                {errors?.name}
-              </Form.Control.Feedback>
-            </Form.Group>
-            <Form.Group as={Col} controlId="formGridCodInternal">
-              <Form.Label>
-                Codigo barra / interno{" "}
-                <strong className="text-danger">*</strong>
-              </Form.Label>
-              <Form.Control
-                name="cod_internal"
-                onChange={handleChange}
-                value={form?.cod_internal}
-                type="text"
-                placeholder="Introduce codigo barra / interno"
-                isInvalid={!!errors?.cod_internal}
-              />
-              <Form.Control.Feedback type="invalid">
-                {errors?.cod_internal}
-              </Form.Control.Feedback>
-            </Form.Group>
-          </Row>
-          <Form.Group className="mb-3" controlId="formGridNote">
-            <Form.Label>Nota</Form.Label>
-            <Form.Control
-              as="textarea"
-              name="note"
-              onChange={handleChange}
-              value={form?.note}
-              isInvalid={!!errors?.note}
-              placeholder="Introduce una nota"
-            />
-            <Form.Control.Feedback type="invalid">
-              {errors?.note}
-            </Form.Control.Feedback>
-          </Form.Group>
           <Row className="mb-3">
             <Form.Group as={Col} controlId="formGridMark">
               <Form.Label>
@@ -414,9 +385,7 @@ const ProductForm = ({
                 {errors?.model}
               </Form.Control.Feedback>
             </Form.Group>
-          </Row>
-          <Row>
-            <Form.Group className="mb-3" as={Col} controlId="formGridUnit">
+            <Form.Group as={Col} controlId="formGridUnit">
               <Form.Label>
                 Unidad de medida <strong className="text-danger">*</strong>
               </Form.Label>
@@ -446,7 +415,103 @@ const ProductForm = ({
                 {errors?.unit}
               </Form.Control.Feedback>
             </Form.Group>
-            <Form.Group className="mb-3" as={Col} controlId="formGridFecVen">
+          </Row>
+          <Row className="mb-3">
+            <Form.Group as={Col} controlId="formGridName">
+              <Form.Label>
+                Nombre <strong className="text-danger">*</strong>
+              </Form.Label>
+              <Form.Control
+                name="name"
+                onChange={handleChange}
+                value={form?.name}
+                type="text"
+                placeholder="Introduce nombre"
+                isInvalid={!!errors?.name}
+              />
+              <Form.Control.Feedback type="invalid">
+                {errors?.name}
+              </Form.Control.Feedback>
+            </Form.Group>
+          </Row>
+          <Row className="mb-3">
+            <Form.Group as={Col} controlId="formGridCodInternal">
+              <Form.Label>
+                Código interno <strong className="text-danger">*</strong>
+              </Form.Label>
+              <Form.Control
+                name="cod_internal"
+                onChange={handleChange}
+                value={form?.cod_internal}
+                type="text"
+                placeholder="Introduce codigo interno"
+                isInvalid={!!errors?.cod_internal}
+              />
+              <Form.Control.Feedback type="invalid">
+                {errors?.cod_internal}
+              </Form.Control.Feedback>
+            </Form.Group>
+            <Form.Group as={Col} controlId="formGridCodInternal">
+              <Form.Label>Nro de Serie</Form.Label>
+              <Form.Control
+                name="nroSerie"
+                onChange={handleChange}
+                value={form?.nroSerie}
+                type="text"
+                placeholder="Introduce Nro de serie"
+                isInvalid={!!errors?.nroSerie}
+              />
+              <Form.Control.Feedback type="invalid">
+                {errors?.nroSerie}
+              </Form.Control.Feedback>
+            </Form.Group>
+            <Form.Group as={Col} controlId="formGridCodInternal">
+              <Form.Label>Codigo barra</Form.Label>
+              <Form.Control
+                name="cod_barra"
+                onChange={handleChange}
+                value={form?.cod_barra}
+                type="text"
+                placeholder="Introduce codigo barra"
+                isInvalid={!!errors?.cod_barra}
+              />
+              <Form.Control.Feedback type="invalid">
+                {errors?.cod_barra}
+              </Form.Control.Feedback>
+            </Form.Group>
+          </Row>
+          <Row className="mb-3">
+            <Form.Group as={Col} controlId="formGridFecAdq">
+              <Form.Label>Fecha de adquisición</Form.Label>
+              <Form.Control
+                name="fecAquision"
+                type="date"
+                value={String(form.fecAquision)}
+                onChange={handleChange}
+                isInvalid={!!errors?.fecAquision}
+              />
+
+              <Form.Control.Feedback type="invalid">
+                {errors?.fecAquision}
+              </Form.Control.Feedback>
+            </Form.Group>
+
+            <Form.Group as={Col} controlId="formGridFecIni">
+              <Form.Label>Fecha de inicio o uso</Form.Label>
+              <Form.Control
+                name="fecInicioUso"
+                type="date"
+                value={String(form.fecInicioUso)}
+                onChange={handleChange}
+                isInvalid={!!errors?.fecInicioUso}
+              />
+
+              <Form.Control.Feedback type="invalid">
+                {errors?.fecInicioUso}
+              </Form.Control.Feedback>
+            </Form.Group>
+
+            <Form.Group as={Col} controlId="formGridFecVen">
               <Form.Label>Fecha de vencimiento</Form.Label>
               <Form.Control
                 name="fecVen"
@@ -458,6 +523,87 @@ const ProductForm = ({
 
               <Form.Control.Feedback type="invalid">
                 {errors?.fecVen}
+              </Form.Control.Feedback>
+            </Form.Group>
+          </Row>
+          <Row className="mb-3">
+            <Form.Group as={Col} controlId="formGridUbi">
+              <Form.Label>Ubicación</Form.Label>
+              <Form.Control
+                name="ubicacionLocal"
+                type="text"
+                value={String(form.ubicacionLocal)}
+                onChange={handleChange}
+                placeholder="Introduce ubicación"
+                isInvalid={!!errors?.ubicacionLocal}
+              />
+
+              <Form.Control.Feedback type="invalid">
+                {errors?.ubicacionLocal}
+              </Form.Control.Feedback>
+            </Form.Group>
+
+            <Form.Group as={Col} controlId="formGridArea">
+              <Form.Label>Area</Form.Label>
+              <Form.Control
+                name="areaLocal"
+                type="text"
+                value={String(form.areaLocal)}
+                onChange={handleChange}
+                placeholder="Introduce area"
+                isInvalid={!!errors?.areaLocal}
+              />
+
+              <Form.Control.Feedback type="invalid">
+                {errors?.areaLocal}
+              </Form.Control.Feedback>
+            </Form.Group>
+
+            <Form.Group as={Col} controlId="formGridLug">
+              <Form.Label>Lugar</Form.Label>
+              <Form.Control
+                name="lugarLocal"
+                type="text"
+                placeholder="Introduce lugar"
+                value={String(form.lugarLocal)}
+                onChange={handleChange}
+                isInvalid={!!errors?.lugarLocal}
+              />
+
+              <Form.Control.Feedback type="invalid">
+                {errors?.lugarLocal}
+              </Form.Control.Feedback>
+            </Form.Group>
+          </Row>
+
+          <Row className="mb-3">
+            <Form.Group as={Col} controlId="formGridStock">
+              <Form.Label>Precio Costo</Form.Label>
+              <Form.Control
+                name="price_c"
+                type="number"
+                step="0.01"
+                onChange={handleChange}
+                value={form?.price_c}
+                isInvalid={!!errors?.price_c}
+                placeholder="Introduce precio costo"
+              />
+              <Form.Control.Feedback type="invalid">
+                {errors?.price_c}
+              </Form.Control.Feedback>
+            </Form.Group>
+            <Form.Group as={Col} controlId="formGridNote">
+              <Form.Label>Descripción o detalle</Form.Label>
+              <Form.Control
+                as="textarea"
+                name="note"
+                onChange={handleChange}
+                value={form?.note}
+                isInvalid={!!errors?.note}
+                placeholder="Introduce una descripción o detalle"
+              />
+              <Form.Control.Feedback type="invalid">
+                {errors?.note}
               </Form.Control.Feedback>
             </Form.Group>
           </Row>

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { Alert, Card, Table, Form, Row, Col, Button } from "react-bootstrap";
 import TableHeader from "../../../components/DatatableComponent/Header/TableHeader";
 import { Product } from "../../../interface/Product";
@@ -10,18 +10,38 @@ import { IAlert } from "../../../interface/IAlert";
 import { differenceInDays } from "date-fns";
 import { CSVLink } from "react-csv";
 import { formatFech } from "../../../lib/helpers/functions/functions";
+import { getAreas } from "../../../api/area/area";
+import { Area } from "../../../interface/Area";
+import { AuthContext } from "../../../context/auth";
+import { Controller, useForm } from "react-hook-form";
+import { getModels } from "../../../api/model/model";
+import { getMarks } from "../../../api/mark/mark";
+import { Mark } from "../../../interface/Mark";
+import { Model } from "../../../interface/Model";
+import Select from "react-select";
+import makeAnimated from "react-select/animated";
+import { AnyAaaaRecord } from "dns";
+
+const animatedComponents = makeAnimated();
 
 const headers = [
   { name: "#", field: "item", sortable: false },
-  { name: "Area/Sede", field: "area", sortable: true },
-  { name: "Cod Interno/Barra", field: "cod_internal", sortable: true },
+  { name: "Sede", field: "area", sortable: true },
+  { name: "Cod. Interno", field: "cod_internal", sortable: true },
   { name: "Producto", field: "name", sortable: true },
-  { name: "Fech. V.", field: "fecVen", sortable: true },
-  { name: "Estado Producto", field: "stateProd", sortable: true },
-  { name: "Dias Restantes", field: "daysVen", sortable: true },
-  { name: "Unidad de medida", field: "unit", sortable: true },
-  { name: "Stock", field: "stock", sortable: true },
-  { name: "Precio", field: "price", sortable: true },
+  { name: "Marca", field: "mark", sortable: true },
+  { name: "Modelo", field: "model", sortable: true },
+  { name: "Uni. Medida", field: "unit", sortable: true },
+  { name: "Nro. Serie", field: "nroSerie", sortable: true },
+  { name: "Cod. Barra", field: "cod_barra", sortable: true },
+  { name: "Fec. Adquisicion", field: "fecAquision", sortable: true },
+  { name: "Fec. inicio/uso", field: "fecInicioUso", sortable: true },
+  { name: "Fec. Vencimiento", field: "fecVen", sortable: true },
+  { name: "Ubicación", field: "ubi", sortable: false },
+
+  // { name: "Stock", field: "stock", sortable: true },
+  // { name: "Precio Venta", field: "price", sortable: true },
+  // { name: "Precio Costo", field: "price_c", sortable: true },
   { name: "Estado", field: "status", sortable: false },
 ];
 
@@ -50,7 +70,21 @@ const ConsultProductScreen = () => {
   const [resource] = useResource();
   const [message, setMessage] = useState<IAlert>(initialStateAlert);
   const [cantProducts, setCantProduct] = useState(0);
-  const [exportXML, setExportXML] = useState([]);
+  const [exportXML, setExportXML] = useState<any[]>([]);
+  const [areas, setAreas] = useState<Area[]>([]);
+  const { user } = useContext(AuthContext);
+
+  const listAreas = useCallback(async () => {
+    const res = await getAreas();
+    const filter = res.data.map((area: any) => {
+      return {
+        _id: area._id,
+        name: area.name,
+        checked: area.name === user.area.name ? true : false,
+      };
+    });
+    setAreas(filter);
+  }, [user]);
 
   const onSorting = (field: string, order: string) =>
     setSorting({ field, order });
@@ -73,7 +107,7 @@ const ConsultProductScreen = () => {
             differenceInDays(new Date(String(format?.fecVen)), new Date()) < 7
             ? "Por vencer"
             : differenceInDays(new Date(String(format?.fecVen)), new Date()) > 6
-            ? "Habilitado"
+            ? "Activo"
             : "Vencido"
           : "Sin fecha",
         daysVen: differenceInDays(new Date(String(format?.fecVen)), new Date()),
@@ -83,130 +117,67 @@ const ConsultProductScreen = () => {
     setProducts(map);
   };
 
-  const productsFiltered = useMemo(() => {
-    let computedProducts: any = products;
+  const { watch, control } = useForm<any>({
+    defaultValues: {
+      area: "TODOS",
+      status: "activo",
+      producto: "",
+      marca: { label: "TODOS", value: "TODOS" },
+      modelo: { label: "TODOS", value: "TODOS" },
+    },
+  });
 
-    if (consult.filter) {
-      if (
-        consult.habs.state ||
-        consult.venc.state ||
-        consult.xvenc.state ||
-        consult.nofec.state
-      ) {
-        if (consult.filterRange) {
-          computedProducts = computedProducts.filter(
-            (product: any) =>
-              (product.stock === 0 &&
-                new Date(product.fecVen).getTime() >=
-                  new Date(consult.start).getTime() &&
-                new Date(product.fecVen).getTime() <=
-                  new Date(consult.end).getTime() &&
-                product.stateProd === consult.habs.name) ||
-              (product.stock === 0 &&
-                new Date(product.fecVen).getTime() >=
-                  new Date(consult.start).getTime() &&
-                new Date(product.fecVen).getTime() <=
-                  new Date(consult.end).getTime() &&
-                product.stateProd === consult.venc.name) ||
-              (product.stock === 0 &&
-                new Date(product.fecVen).getTime() >=
-                  new Date(consult.start).getTime() &&
-                new Date(product.fecVen).getTime() <=
-                  new Date(consult.end).getTime() &&
-                product.stateProd === consult.xvenc.name) ||
-              (product.stock === 0 &&
-                new Date(product.fecVen).getTime() >=
-                  new Date(consult.start).getTime() &&
-                new Date(product.fecVen).getTime() <=
-                  new Date(consult.end).getTime() &&
-                product.stateProd === consult.nofec.name)
-          );
-        } else {
-          computedProducts = computedProducts.filter(
-            (product: any) =>
-              (product.stock === 0 &&
-                product.stateProd === consult.habs.name) ||
-              (product.stock === 0 &&
-                product.stateProd === consult.venc.name) ||
-              (product.stock === 0 &&
-                product.stateProd === consult.xvenc.name) ||
-              (product.stock === 0 && product.stateProd === consult.nofec.name)
-          );
-        }
+  const area = watch("area");
+  const estado = watch("status");
+  const productoInput = watch("producto");
+  const marcaSelect = watch("marca");
+  const modeloSelect = watch("modelo");
+  console.log(watch());
+  const productsFiltered = useMemo(() => {
+    // if (resource.canRead)
+    //   return computedProducts.slice(
+    //     (currentPage - 1) * ITEMS_PER_PAGE,
+    //     (currentPage - 1) * ITEMS_PER_PAGE + ITEMS_PER_PAGE
+    //   );
+    // else return [];
+    let computedProducts: any[] = products;
+    if (area === "TODOS") {
+      if (marcaSelect.value === "TODOS" && modeloSelect.value === "TODOS") {
+        // eslint-disable-next-line no-self-assign
+        computedProducts = computedProducts;
       } else {
-        //buscar por rango de fecha los productos con stock 0 y el filtro busqueda stock 0 activado + click en el boton de busqueda
-        if (consult.filterRange) {
-          computedProducts = computedProducts.filter(
-            (product: any) =>
-              product.stock === 0 &&
-              new Date(product.fecVen).getTime() >=
-                new Date(consult.start).getTime() &&
-              new Date(product.fecVen).getTime() <=
-                new Date(consult.end).getTime()
+        computedProducts = computedProducts.filter((a) => {
+          console.log(a.model.name, modeloSelect.value);
+          return (
+            a.mark.name === marcaSelect.value &&
+            a.model.name === modeloSelect.value
           );
-        } else {
-          computedProducts = computedProducts.filter(
-            (product: any) => product.stock === 0
-          );
-        }
+        });
       }
     } else {
-      if (consult.filterRange) {
-        computedProducts = computedProducts.filter(
-          (product: any) =>
-            (product.stock !== 0 &&
-              new Date(product.fecVen).getTime() >=
-                new Date(consult.start).getTime() &&
-              new Date(product.fecVen).getTime() <=
-                new Date(consult.end).getTime() &&
-              product.stateProd === consult.habs.name) ||
-            (product.stock !== 0 &&
-              new Date(product.fecVen).getTime() >=
-                new Date(consult.start).getTime() &&
-              new Date(product.fecVen).getTime() <=
-                new Date(consult.end).getTime() &&
-              product.stateProd === consult.venc.name) ||
-            (product.stock !== 0 &&
-              new Date(product.fecVen).getTime() >=
-                new Date(consult.start).getTime() &&
-              new Date(product.fecVen).getTime() <=
-                new Date(consult.end).getTime() &&
-              product.stateProd === consult.xvenc.name) ||
-            (product.stock !== 0 &&
-              new Date(product.fecVen).getTime() >=
-                new Date(consult.start).getTime() &&
-              new Date(product.fecVen).getTime() <=
-                new Date(consult.end).getTime() &&
-              product.stateProd === consult.nofec.name)
+      computedProducts = computedProducts.filter((a) => {
+        return (
+          a.area.name === area &&
+          (estado === "activo"
+            ? a.status === true && a.area.name === area
+            : a.status === false && a.area.name === area) &&
+          a.mark.name === marcaSelect.value &&
+          a.model.name === modeloSelect.value
         );
-      } else {
-        if (
-          consult.habs.state ||
-          consult.venc.state ||
-          consult.xvenc.state ||
-          consult.nofec.state
-        ) {
-          computedProducts = computedProducts.filter(
-            (product: any) =>
-              (product.stock !== 0 &&
-                product.stateProd === consult.habs.name) ||
-              (product.stock !== 0 &&
-                product.stateProd === consult.venc.name) ||
-              (product.stock !== 0 &&
-                product.stateProd === consult.xvenc.name) ||
-              (product.stock !== 0 && product.stateProd === consult.nofec.name)
-          );
-        } else {
-          computedProducts = computedProducts.filter(
-            (product: any) => product.stock !== 0
-          );
-        }
-      }
+      });
     }
 
-    setTotalItems(computedProducts.length);
+    if (productoInput) {
+      computedProducts = computedProducts.filter((a) => {
+        return (
+          a.name.toLowerCase().includes(productoInput.toLowerCase()) ||
+          a.cod_internal.toLowerCase().includes(productoInput.toLowerCase()) ||
+          a.cod_barra.toLowerCase().includes(productoInput.toLowerCase()) ||
+          a.nroSerie.toLowerCase().includes(productoInput.toLowerCase())
+        );
+      });
+    }
 
-    //Sorting comments
     if (sorting.field) {
       const reversed = sorting.order === "asc" ? 1 : -1;
       computedProducts = computedProducts.sort((a: any, b: any) => {
@@ -232,39 +203,61 @@ const ConsultProductScreen = () => {
       });
     }
 
-    setCantProduct(computedProducts.length);
     setExportXML(computedProducts);
+    return computedProducts;
 
-    if (resource.canRead)
-      return computedProducts.slice(
-        (currentPage - 1) * ITEMS_PER_PAGE,
-        (currentPage - 1) * ITEMS_PER_PAGE + ITEMS_PER_PAGE
-      );
-    else return [];
+    //setTotalItems(computedProducts.length);
+
+    //Sorting comments
+
+    // setCantProduct(computedProducts.length);
+    // setExportXML(computedProducts);
   }, [
     products,
-    sorting,
-    currentPage,
-    consult.filter,
-    resource.canRead,
-    consult.habs.state,
-    consult.venc.state,
-    consult.xvenc.state,
-    consult.nofec.state,
-    consult.nofec.name,
-    consult.venc.name,
-    consult.habs.name,
-    consult.xvenc.name,
-    consult.end,
-    consult.start,
-    consult.filterRange,
+    area,
+    productoInput,
+    sorting.field,
+    sorting.order,
+    marcaSelect.value,
+    modeloSelect.value,
+    estado,
   ]);
 
   const onPageChange = (page: number) => setCurrentPage(page);
+  const [marks, setMarks] = useState<any[]>([]);
+  const [models, setModels] = useState<any[]>([]);
+
+  const listMarks = async () => {
+    const res = await getMarks();
+    const { data } = res;
+    const marks = data.map((mod: any) => {
+      return {
+        label: mod.name,
+        value: mod.name,
+      };
+    });
+    setMarks([{ label: "TODOS", value: "TODOS" }, ...marks]);
+  };
+
+  const listModels = async () => {
+    const res = await getModels();
+    const { data } = res;
+    const models: any[] = data.map((mod: any) => {
+      return {
+        label: mod.name,
+        value: mod.name,
+      };
+    });
+
+    setModels([{ label: "TODOS", value: "TODOS" }, ...models]);
+  };
 
   useEffect(() => {
-    if (resource.canRead) listProduct();
-  }, [resource.canRead]);
+    listAreas();
+    listProduct();
+    listMarks();
+    listModels();
+  }, [resource.canRead, listAreas]);
 
   const goSearch = () => setConsult({ ...consult, filterRange: true });
 
@@ -279,12 +272,15 @@ const ConsultProductScreen = () => {
     return {
       ...product,
       area: product.area.name,
+      mark: product.mark.name,
+      model: product.model.name,
       cod_internal: product.cod_internal.slice(3),
+      ubi: `${product.ubicacionLocal}-${product.areaLocal}-${product.lugarLocal}`,
       fecVen: product.fecVen
         ? formatFech(new Date(String(product.fecVen)))
-        : "Sin fecha de vencimiento",
+        : "-",
       unit: product.unit.name,
-      daysVen: product.daysVen ? product.daysVen : "Sin fecha de vencimiento",
+      daysVen: product.daysVen ? product.daysVen : "-",
       item: i + 1,
     };
   });
@@ -296,7 +292,115 @@ const ConsultProductScreen = () => {
         {message.type && (
           <Alert variant={message.type}>{message.message}</Alert>
         )}
-        {showRange && (
+
+        <Row className="mb-3">
+          <Form.Group sm={3} as={Col} controlId="formGridSede">
+            <Form.Label>Sede</Form.Label>
+            <Controller
+              control={control}
+              name="area"
+              render={({ field: { onChange, ref, onBlur, value } }) => {
+                return (
+                  <Form.Select
+                    onChange={onChange}
+                    ref={ref}
+                    onBlur={onBlur}
+                    value={String(value)}
+                  >
+                    <option value="TODOS">TODOS</option>
+                    {areas.map((area) => (
+                      <option key={area._id} value={area.name}>
+                        {area.name}
+                      </option>
+                    ))}
+                  </Form.Select>
+                );
+              }}
+            />
+          </Form.Group>
+          <Form.Group sm={3} as={Col} controlId="formGridSede">
+            <Form.Label>Marca</Form.Label>
+            <Controller
+              control={control}
+              name="marca"
+              render={({ field: { onChange, ref, onBlur, value } }) => {
+                return (
+                  <Select
+                    placeholder="[Seleccione marca]"
+                    closeMenuOnSelect={true}
+                    components={animatedComponents}
+                    ref={ref}
+                    value={value}
+                    onChange={onChange}
+                    onBlur={onBlur}
+                    options={marks}
+                  />
+                );
+              }}
+            />
+          </Form.Group>
+          <Form.Group sm={3} as={Col} controlId="formGridSede">
+            <Form.Label>Modelo</Form.Label>
+            <Controller
+              control={control}
+              name="modelo"
+              render={({ field: { onChange, ref, onBlur, value } }) => {
+                return (
+                  <Select
+                    placeholder="[Seleccione modelo]"
+                    closeMenuOnSelect={true}
+                    components={animatedComponents}
+                    ref={ref}
+                    value={value}
+                    onChange={onChange}
+                    onBlur={onBlur}
+                    options={models}
+                  />
+                );
+              }}
+            />
+          </Form.Group>
+        </Row>
+        {area === "TODOS" || (
+          <>
+            <Row className="mb-3">
+              <Form.Group sm={3} as={Col} controlId="formGridEst">
+                <Form.Label>Estado</Form.Label>
+                <Controller
+                  control={control}
+                  name="status"
+                  render={({ field: { onChange, ref, onBlur, value } }) => {
+                    return (
+                      <Form.Select
+                        onChange={onChange}
+                        ref={ref}
+                        onBlur={onBlur}
+                        value={String(value)}
+                      >
+                        <option value="activo">Activos</option>
+                        <option value="inactivo">Inactivos</option>
+                      </Form.Select>
+                    );
+                  }}
+                />
+              </Form.Group>
+            </Row>
+          </>
+        )}
+
+        {/* <Row className="d-flex justify-content-end" style={{}}>
+          <Col sm={3}>
+            <Button
+              onClick={onClickConsultar}
+              style={{ width: "100%" }}
+              variant="primary"
+            >
+              Consultar
+            </Button>
+          </Col>
+        </Row> */}
+
+        {/* {showRange && (
           <Row className="mb-3">
             <Form.Group md="3" as={Col} controlId="formGridStart">
               <Form.Label>
@@ -381,7 +485,7 @@ const ConsultProductScreen = () => {
           <Form.Group md="4" as={Col} controlId="formCheckboxHab">
             <Form.Check
               type="checkbox"
-              label="Buscar productos habilitados"
+              label="Buscar productos activos"
               name="habs"
               onChange={(e) => {
                 setCurrentPage(1);
@@ -456,6 +560,31 @@ const ConsultProductScreen = () => {
               checked={consult.nofec.state}
             />
           </Form.Group>
+        </Row> */}
+        <Alert variant={"info"}>
+          Puedes buscar producto por nombre, código interno, código de barra o
+          nro de serie.
+        </Alert>
+        <Row className="mb-3">
+          <Form.Group sm={3} as={Col} controlId="formGridPro">
+            <Form.Label>Buscar producto</Form.Label>
+            <Controller
+              control={control}
+              name="producto"
+              render={({ field: { onChange, ref, onBlur, value } }) => {
+                return (
+                  <Form.Control
+                    onChange={onChange}
+                    ref={ref}
+                    value={value}
+                    type="text"
+                    placeholder="Introduce un valor"
+                    onBlur={onBlur}
+                  />
+                );
+              }}
+            />
+          </Form.Group>
         </Row>
         <div
           className="mb-3"
@@ -469,7 +598,7 @@ const ConsultProductScreen = () => {
           />
           <div style={{ display: "flex", alignItems: "flex-end" }}>
             <span style={{ marginLeft: 5 }}>
-              Se encontraron un total de {cantProducts} registros
+              Se encontraron un total de {productsFiltered.length} registros
             </span>
           </div>
         </div>
@@ -485,7 +614,7 @@ const ConsultProductScreen = () => {
               <CSVLink
                 data={dataXML}
                 headers={headerXML}
-                filename="reporte-productos.csv"
+                filename={`reporte_${new Date().getTime()}.csv`}
                 target="_blank"
                 separator={";"}
               >
@@ -497,7 +626,7 @@ const ConsultProductScreen = () => {
                 </Form.Label>
               </CSVLink>
             </Form.Group>
-            <Table striped bordered hover responsive>
+            <Table striped bordered hover responsive size="sm">
               <TableHeader headers={headers} onSorting={onSorting} />
               <tbody>
                 {productsFiltered.map((product: any, i: number) => (

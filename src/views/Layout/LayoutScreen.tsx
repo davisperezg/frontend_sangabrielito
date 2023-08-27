@@ -43,7 +43,7 @@ const LayoutScreen = () => {
           <Route path="/modulos" element={<ModulesScreen />} />
           <Route path="/permisos" element={<OptionsScreen />} />
           <Route path="/marcas" element={<MarkScreen />} />
-          <Route path="/categorias" element={<ModelScreen />} />
+          <Route path="/modelos" element={<ModelScreen />} />
           <Route path="/productos" element={<ProductScreen />} />
           <Route path="/unidad-medida" element={<UnitScreen />} />
           <Route path="/clientes" element={<ClientScreen />} />

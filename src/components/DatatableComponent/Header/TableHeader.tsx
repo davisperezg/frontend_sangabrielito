@@ -52,6 +52,10 @@ const TableHeader = ({
       <tr>
         {newHeaders.map(({ name, field, sortable }) => (
           <th
+            style={{
+              userSelect: "none",
+              cursor: "pointer",
+            }}
             key={name}
             onClick={() => (sortable ? onSortingChange(field) : null)}
           >
